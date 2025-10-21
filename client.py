@@ -9,10 +9,10 @@ import json
 
 # source_name = socket.gethostname()
 # source_addr = socket.gethostbyname(source_name)
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.connect(("8.8.8.8", 80))
-source_addr = s.getsockname()[0]
-s.close()
+temp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+temp.connect(("8.8.8.8", 80))
+source_addr = temp.getsockname()[0]
+temp.close()
 print(source_addr)
 test_dest = '163.118.57.142'
 
@@ -50,6 +50,19 @@ def message_receive():
             print('packet found but no payload')
 
     print(sniff(prn=recv_protocol, filter=f'src {source_addr} and dst {test_dest}', count=1))
+
+
+def sock_recv():
+    print('running')
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(('163.118.57.142', 12345))
+    print('listening...')
+    s.listen(1)
+    print('accepting...')
+    conn, addr = s.accept()
+    print(f"Connected by {addr}")
+    d = conn.recv(1024)
+    print(d.decode('utf-8'))
 
 
 msg_data = "Hello World!"
