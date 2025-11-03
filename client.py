@@ -1,7 +1,6 @@
 import socket
-import threading
 import json
-import customtkinter
+import time
 
 
 # source_name = socket.gethostname()
@@ -11,6 +10,9 @@ temp.connect(("8.8.8.8", 80))
 source_addr = temp.getsockname()[0]
 temp.close()
 test_dest = '163.118.57.142'
+
+recv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+recv_socket.bind((source_addr, 12345))
 
 
 def message_send(message_data):
@@ -25,20 +27,12 @@ def message_send(message_data):
 
 def message_recv():
     print('running')
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(('163.118.57.142', 12345))
     print('listening...')
-    s.listen(1)
+    recv_socket.listen(1)
     print('accepting...')
-    conn, addr = s.accept()
+    conn, addr = recv_socket.accept()
     print(f"Connected by {addr}")
     d = conn.recv(1024)
-    print(d.decode('utf-8'))
-
-
-#sniff_thread = threading.Thread(target=message_receive)
-#send_thread = threading.Thread(target=message_send, args=(msg_data,))
-
-#sniff_thread.start()
-#send_thread.start()
+    time.sleep(20)
+    return d.decode('utf-8')
 

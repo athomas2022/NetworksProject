@@ -1,42 +1,122 @@
 from customtkinter import *
+import threading
 import client
-class App(CTk):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+from queue import Queue
+import os
 
-        self.ChatFrame = CTkFrame(master=self, width=600, height=900)
-        self.ChatFrame.pack_propagate(False)
-        self.ChatFrame.pack(pady=(50, 0), side="right")
-        self.ChatScrollable = CTkScrollableFrame(master=self.ChatFrame, orientation="vertical", width=200)
-        self.ChatScrollable.pack(pady=(0, 0), expand=1, fill="both")
-        self.ChatEntry = CTkEntry(master=self.ChatFrame, placeholder_text="Type message...", width=550, height=100)
-        self.ChatEntry.pack(side="left")
-        self.ChatSendButton = CTkButton(master=self.ChatFrame, text="Send", height=100, command=self.send_btn)
-        self.ChatSendButton.pack(side="right")
-        self.ContactFrame = CTkFrame(master=self, width=300, height=750)
-        self.ContactFrame.pack_propagate(False)
-        self.ContactFrame.pack(expand=1, side="left")
-        self.ContactScrollable = CTkScrollableFrame(master=self.ContactFrame, orientation="vertical")
-        self.ContactScrollable.pack(expand=1, fill="both")
 
-    def send_btn(self):
-        msg_data = 'Me: ' + self.ChatEntry.get()
-        if len(msg_data) > 0:
-            print(msg_data)
-            client.message_send(self.ChatEntry.get())
-            new_message = CTkTextbox(master=self.ChatScrollable, height=24*(1+(len(msg_data)//92)), wrap='word')
-            new_message.insert('0.0', msg_data)
-            new_message.tag_config('sender_color', foreground='red')
-            new_message.tag_add('sender_color', '1.0', '1.4')
-            new_message.configure(state='disabled')
-            new_message.pack(fill='x')
-            self.ChatEntry.delete(0, len(msg_data))
+incoming = Queue()
+contact_list = []
 
+
+def refresh_contact_list():
+    for wg in ContactScrollable.winfo_children():
+        wg.destroy()
+    for c in contact_list:
+        cb = CTkButton(master=ContactScrollable, text=c, height=20)
+        cb.pack(pady=(2, 2), fill='x')
+
+
+def get_contacts():
+    contact_list.clear()
+    if not os.path.exists('contact_list.txt'):
+        with open('contact_list.txt', 'w') as test:
+            pass
+    with open('contact_list.txt', 'r') as cl:
+        for contact in cl:
+            contact_list.append(contact)
+    refresh_contact_list()
+
+
+def write_contact(new_contact):
+    if new_contact in contact_list or len(new_contact.strip()) == 0:
+        return 1
+    with open('contact_list.txt', 'a') as cl:
+        cl.write(f'{new_contact}\n')
+    get_contacts()
+    return 0
+
+
+def generate_message_text(md, clr):
+    new_message = CTkTextbox(master=ChatScrollable, height=24 * (1 + (len(md) // 92)), wrap='word')
+    new_message.insert('0.0', md)
+    new_message.tag_config('sender_color', foreground=clr)
+    new_message.tag_add('sender_color', '1.0', '1.4')
+    new_message.configure(state='disabled')
+    new_message.pack(fill='x')
+
+
+def send_btn():
+    msg_data = 'Me: ' + ChatEntry.get()
+    if len(msg_data) > 4:
+        print(msg_data)
+        #client.message_send(self.ChatEntry.get())
+        generate_message_text(msg_data, 'red')
+        ChatEntry.delete(0, len(msg_data))
+
+
+def msg_recv():
+    while True:
+        external_msg = client.message_recv()
+        if external_msg:
+            incoming.put(external_msg)
+
+
+def menu_gui():
+    def add_contact(contact):
+        write_contact(contact)
+        ContactEntry.delete(0, len(contact))
+
+
+    menu_root = CTk()
+    menu_root.title('Menu')
+    menu_root.geometry('400x300')
+    root.configure(fg_color=['gray92', 'gray14'])
+    MenuFrame = CTkFrame(master=menu_root, width=400, height=300)
+    MenuFrame.pack(side='top')
+    ContactEntry = CTkEntry(master=MenuFrame, placeholder_text='Enter contact IP...', width=300, height=50)
+    ContactEntry.pack(expand=1, side='left')
+    ContactBtn = CTkButton(master=MenuFrame, text='Add', width=50, height=50, command=lambda: add_contact(ContactEntry.get()))
+    ContactBtn.pack(side='right')
+    menu_root.mainloop()
+
+
+
+recv_thread = threading.Thread(target=msg_recv, daemon=True)
+recv_thread.start()
 
 set_default_color_theme("dark-blue")
-root = App()
-root.geometry("900x750")
-root.title("Window")
-root.configure(fg_color=['gray92', 'gray14'])
-root.mainloop()
 
+root = CTk()
+root.title("Rumor")
+root.geometry("900x750")
+root.configure(fg_color=['gray92', 'gray14'])
+
+ChatFrame = CTkFrame(master=root, width=600, height=900)
+ChatFrame.pack_propagate(False)
+ChatFrame.pack(pady=(0, 0), side="right")
+MenuBtn = CTkButton(master=ChatFrame, text='menu', command=menu_gui)
+MenuBtn.pack(side='top')
+ChatScrollable = CTkScrollableFrame(master=ChatFrame, orientation="vertical", width=200)
+ChatScrollable.pack(pady=(0, 0), expand=1, fill="both")
+ChatEntry = CTkEntry(master=ChatFrame, placeholder_text="Type message...", width=550, height=100)
+ChatEntry.pack(side="left")
+ChatSendButton = CTkButton(master=ChatFrame, text="Send", height=100, command=send_btn)
+ChatSendButton.pack(side="right")
+ContactFrame = CTkFrame(master=root, width=300, height=750)
+ContactFrame.pack_propagate(False)
+ContactFrame.pack(expand=1, side="left")
+ContactScrollable = CTkScrollableFrame(master=ContactFrame, orientation="vertical")
+ContactScrollable.pack(expand=1, fill="both")
+
+
+def check_incoming():
+    while not incoming.empty():
+        msg = incoming.get()
+        generate_message_text(msg, 'blue')
+    root.after(100, check_incoming)
+
+
+get_contacts()
+check_incoming()
+root.mainloop()
