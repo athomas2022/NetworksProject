@@ -25,6 +25,7 @@ def get_contacts():
     with open('contact_list.txt', 'r') as cl:
         for contact in cl:
             contact_list.append(contact)
+    client.update_cc(len(contact_list))
     refresh_contact_list()
 
 
@@ -50,7 +51,7 @@ def send_btn():
     msg_data = 'Me: ' + ChatEntry.get()
     if len(msg_data) > 4:
         print(msg_data)
-        #client.message_send(self.ChatEntry.get())
+        client.message_send(ChatEntry.get())
         generate_message_text(msg_data, 'red')
         ChatEntry.delete(0, len(msg_data))
 
@@ -79,7 +80,6 @@ def menu_gui():
     ContactBtn = CTkButton(master=MenuFrame, text='Add', width=50, height=50, command=lambda: add_contact(ContactEntry.get()))
     ContactBtn.pack(side='right')
     menu_root.mainloop()
-
 
 
 recv_thread = threading.Thread(target=msg_recv, daemon=True)
