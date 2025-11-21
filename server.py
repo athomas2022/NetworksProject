@@ -92,7 +92,7 @@ def message_send(message_data, addr):
 print('initializing system...')
 initialize()
 listen_thread = threading.Thread(target=message_recv, daemon=True)
-
+listen_thread.start()
 print('system running!')
 while True:
     while not send_queue.empty():
