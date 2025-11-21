@@ -66,27 +66,29 @@ def add_client(addr):
 
 
 def message_recv():
-    server_socket.listen(len(client_list.keys())+1)
-    conn, addr_raw = server_socket.accept()
-    addr = addr_raw[0] #addr_raw[addr_raw.index('(')+1:addr_raw.index(',')]
-    if addr not in client_list.values():
-        fc = add_client(addr)
-        message_send(f'{keyword} {fc}', addr)
-        return
-    print(f"Connected by {addr}")
-    d = conn.recv(1024)
-    msg = json.loads(d.decode('utf-8'))
-    if keyword in msg['message']:
-        fc = ''
-        for k, v in client_list.items():
-            if v == addr:
-                message_send(f'{keyword} {k}', addr)
-                return
-    friend_code = msg['sendee']
-    address = client_list[friend_code]
-    msg['sendee'] = address
-    send_queue.put(msg)
-    conn.close()
+    while True:
+        server_socket.listen(len(client_list.keys())+1)
+        conn, addr_raw = server_socket.accept()
+        addr = addr_raw[0] #addr_raw[addr_raw.index('(')+1:addr_raw.index(',')]
+        if addr not in client_list.values():
+            fc = add_client(addr)
+            message_send(f'{keyword} {fc}', addr)
+            return
+        print(f"Connected by {addr}")
+        d = conn.recv(1024)
+        msg = json.loads(d.decode('utf-8'))
+        if keyword in msg['message']:
+            fc = ''
+            for k, v in client_list.items():
+                if v == addr:
+                    message_send(f'{keyword} {k}', addr)
+                    return
+        friend_code = msg['sendee']
+        address = client_list[friend_code]
+        msg['sendee'] = address
+        send_queue.put(msg)
+        conn.close()
+
 
 
 def message_send(message_data, addr):
