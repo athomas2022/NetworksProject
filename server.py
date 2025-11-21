@@ -49,6 +49,7 @@ def get_clients():
     with open(client_file, 'r') as cl:
         cl_csv = csv.reader(cl)
         for row in cl_csv:
+            print(f'{len(row)}: {row}')
             client_list[row[0]] = row[1]
 
 
@@ -64,8 +65,9 @@ def add_client(addr):
 
 def message_recv():
     server_socket.listen(len(client_list.keys())+1)
-    conn, addr = server_socket.accept()
-    if addr not in client_list.keys():
+    conn, addr_raw = server_socket.accept()
+    addr = addr_raw[addr_raw.index('(')+1:addr_raw.index(',')]
+    if addr not in client_list.values():
         fc = add_client(addr)
         message_send(f'{keyword} {fc}', addr)
         return
