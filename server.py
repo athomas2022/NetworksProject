@@ -68,6 +68,8 @@ def message_recv():
     server_socket.listen(len(client_list.keys())+1)
     conn, addr_raw = server_socket.accept()
     addr = addr_raw[0] #addr_raw[addr_raw.index('(')+1:addr_raw.index(',')]
+    for v in client_list.values():
+        print(v)
     if addr not in client_list.values():
         fc = add_client(addr)
         message_send(f'{keyword} {fc}', addr)

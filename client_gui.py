@@ -142,8 +142,8 @@ def check_incoming():
     while not incoming.empty():
         msg = incoming.get()
         msg_json = json.loads(msg)
-        if msg_json['message'].contains(keyword):
-            fc = msg_json['message'].replace(keyword, '').trim()
+        if keyword in msg_json['message']:
+            fc = msg_json['message'].replace(keyword, '').strip()
             CTkMessagebox(title='Successful server connection', message=f'Your server friendcode is {fc}')
         else:
             generate_message_text(msg, 'blue')
