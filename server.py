@@ -43,6 +43,7 @@ def initialize():
     if not os.path.exists(client_file):
         with open(client_file, 'w') as cl:
             pass
+    get_clients()
 
 
 def get_clients():
@@ -76,7 +77,6 @@ def message_recv():
         return
     print(f"Connected by {addr}")
     d = conn.recv(1024)
-    time.sleep(20)
     msg = json.loads(d.decode('utf-8'))
     friend_code = msg['sendee']
     address = client_list[friend_code]
