@@ -8,15 +8,30 @@ import random
 from queue import Queue
 
 
-temp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-temp.connect(("8.8.8.8", 80))
-source_addr = temp.getsockname()[0]
-temp.close()
+keyword = "gR33tinG$"
+selected = False
+source_addr = ''
+while not selected:
+    server_type = input('Running internal or external server?: ')
+    match server_type:
+        case 'internal':
+            temp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            temp.connect(("8.8.8.8", 80))
+            source_addr = temp.getsockname()[0]
+            temp.close()
+            selected = True
+        case 'external':
+            source_addr = socket.gethostbyname(socket.gethostname())
+            selected = True
+        case _:
+            print('invalid entry, options are \'external\' or \'internal\'')
 
+portnum = 3231
 fc_seed = int(time.time())
 random.seed(fc_seed)
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind((source_addr, 3231))
+server_socket.bind((source_addr, portnum))
+print(f'server listening on address {source_addr} on port {portnum}')
 
 client_list = dict()
 client_file = 'client_list.csv'
@@ -53,7 +68,8 @@ def message_recv():
     conn, addr = server_socket.accept()
     if addr not in client_list.keys():
         fc = add_client(addr)
-        message_send(fc, addr)
+        message_send(f'{keyword} {fc}', addr)
+        return
     print(f"Connected by {addr}")
     d = conn.recv(1024)
     time.sleep(20)
