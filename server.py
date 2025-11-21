@@ -92,6 +92,7 @@ def message_send(message_data, addr):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print('connecting...')
     sock.connect((addr, 12345))
+    print(f'connected to {addr}!')
     payload = {"message": message_data, "sendee": source_addr}
     payload_data = json.dumps(payload).encode('utf-8')
     sock.sendall(payload_data)

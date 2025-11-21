@@ -22,6 +22,7 @@ def on_close():
 def refresh_contact_list():
     for wg in ContactScrollable.winfo_children():
         wg.destroy()
+    print(len(contact_list))
     for c in contact_list:
         cb = CTkButton(master=ContactScrollable, text=c, height=20, command=lambda: set_contact(c))
         cb.pack(pady=(2, 2), fill='x')
