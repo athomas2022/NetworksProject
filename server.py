@@ -49,8 +49,9 @@ def get_clients():
     with open(client_file, 'r') as cl:
         cl_csv = csv.reader(cl)
         for row in cl_csv:
-            print(f'{len(row)}: {row}')
-            client_list[row[0]] = row[1]
+            if len(row) == 2:
+                print(f'{len(row)}: {row}')
+                client_list[row[0]] = row[1]
 
 
 def add_client(addr):
