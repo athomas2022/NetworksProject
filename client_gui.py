@@ -92,7 +92,7 @@ def menu_gui():
         global server_addr
         server_addr = server
         client.update_server_mode(True)
-        client.message_send(keyword, server)
+        client.message_send(keyword, server, server)
         ServerContactEntry.configure(state='normal', placeholder_text='Enter friendcode...')
         ServerContactBtn.configure(state='normal')
 

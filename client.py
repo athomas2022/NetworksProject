@@ -54,6 +54,5 @@ def message_recv():
     conn, addr = recv_socket.accept()
     print(f"Connected by {addr}")
     d = conn.recv(1024)
-    time.sleep(0.05)
     return d.decode('utf-8')
 
