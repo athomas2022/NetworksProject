@@ -10,13 +10,20 @@ import json
 incoming = Queue()
 contact_list = []
 keyword = "gR33tinG$"
+server_contact = ''
+server_addr = ''
+direct_contact = ''
 
+
+def on_close():
+    client.close()
+    root.destroy()
 
 def refresh_contact_list():
     for wg in ContactScrollable.winfo_children():
         wg.destroy()
     for c in contact_list:
-        cb = CTkButton(master=ContactScrollable, text=c, height=20)
+        cb = CTkButton(master=ContactScrollable, text=c, height=20, command=lambda: set_contact(c))
         cb.pack(pady=(2, 2), fill='x')
 
 
@@ -41,6 +48,11 @@ def write_contact(new_contact):
     return 0
 
 
+def set_contact(c):
+    global server_contact
+    server_contact = c
+
+
 def generate_message_text(md, clr):
     new_message = CTkTextbox(master=ChatScrollable, height=24 * (1 + (len(md) // 92)), wrap='word')
     new_message.insert('0.0', md)
@@ -54,7 +66,7 @@ def send_btn():
     msg_data = 'Me: ' + ChatEntry.get()
     if len(msg_data) > 4:
         print(msg_data)
-        client.message_send(ChatEntry.get())
+        client.message_send(ChatEntry.get(), server_contact, server_addr)
         generate_message_text(msg_data, 'red')
         ChatEntry.delete(0, len(msg_data))
 
@@ -76,9 +88,11 @@ def menu_gui():
             return 'normal'
         return 'disabled'
 
-    def server_connect(server_addr):
+    def server_connect(server):
+        global server_addr
+        server_addr = server
         client.update_server_mode(True)
-        client.message_send(keyword, server_addr)
+        client.message_send(keyword, server)
         ServerContactEntry.configure(state='normal', placeholder_text='Enter friendcode...')
         ServerContactBtn.configure(state='normal')
 
@@ -105,7 +119,7 @@ def menu_gui():
     ServerBtn.grid(column=1, row=1)
     ServerContactEntry = CTkEntry(master=MenuFrame, placeholder_text='Enter friendcode...', width=300, height=50, state=is_disabled())
     ServerContactEntry.grid(column=0, row=2)
-    ServerContactBtn = CTkButton(master=MenuFrame, text='Add', width=100, height=50, state=is_disabled())
+    ServerContactBtn = CTkButton(master=MenuFrame, text='Add', width=100, height=50, command=lambda: write_contact(ServerContactEntry.get()), state=is_disabled())
     ServerContactBtn.grid(column=1, row=2)
     menu_root.mainloop()
 
@@ -117,6 +131,7 @@ set_default_color_theme("dark-blue")
 
 root = CTk()
 root.title("A.Y.D.E.G.E.R.")
+root.protocol('WM_DELETE_WINDOW', on_close)
 root.geometry("900x750")
 root.configure(fg_color=['gray92', 'gray14'])
 
@@ -147,7 +162,7 @@ def check_incoming():
             CTkMessagebox(title='Successful server connection', message=f'Your server friendcode is {fc}')
         else:
             generate_message_text(msg, 'blue')
-    root.after(100, check_incoming)
+    root.after(50, check_incoming)
 
 
 get_contacts()

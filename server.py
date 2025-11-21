@@ -109,4 +109,4 @@ while True:
         addr = msg['sendee']
         msg_to_send = json.dumps(msg)
         message_send(msg_to_send, addr)
-    time.sleep(0.1)
+    time.sleep(0.05)

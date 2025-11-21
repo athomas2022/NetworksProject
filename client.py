@@ -17,6 +17,10 @@ recv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 recv_socket.bind((source_addr, 12345))
 
 
+def close():
+    recv_socket.close()
+
+
 def update_server_mode(mode):
     global server_mode
     server_mode = mode
@@ -31,10 +35,11 @@ def update_cc(updated_cc):
     global contact_count
     contact_count = updated_cc
 
-def message_send(message_data, dest):
+
+def message_send(message_data, dest, serv):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print('connecting...')
-    sock.connect((dest, 3231))
+    sock.connect((serv, 3231))
     payload = {"message": message_data, "sendee": dest}
     payload_data = json.dumps(payload).encode('utf-8')
     sock.sendall(payload_data)
@@ -49,6 +54,6 @@ def message_recv():
     conn, addr = recv_socket.accept()
     print(f"Connected by {addr}")
     d = conn.recv(1024)
-    time.sleep(20)
+    time.sleep(0.05)
     return d.decode('utf-8')
 
