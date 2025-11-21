@@ -86,6 +86,7 @@ def message_recv():
     address = client_list[friend_code]
     msg['sendee'] = address
     send_queue.put(msg)
+    conn.close()
 
 
 def message_send(message_data, addr):
