@@ -47,17 +47,17 @@ def initialize():
 
 def get_clients():
     with open(client_file, 'r') as cl:
-        with csv.reader(cl) as cl_csv:
-            for row in cl_csv:
-                client_list[row[0]] = row[1]
+        cl_csv = csv.reader(cl)
+        for row in cl_csv:
+            client_list[row[0]] = row[1]
 
 
 def add_client(addr):
     code = 0
     with open(client_file, 'a') as cl:
-        with csv.writer(cl) as cl_csv:
-            code = random.randint(1000000, 1000000000)
-            cl_csv.writerow([code, addr])
+        cl_csv = csv.writer(cl)
+        code = random.randint(1000000, 1000000000)
+        cl_csv.writerow([code, addr])
     get_clients()
     return code
 
