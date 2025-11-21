@@ -77,9 +77,11 @@ def message_recv():
     d = conn.recv(1024)
     msg = json.loads(d.decode('utf-8'))
     if keyword in msg['message']:
-        fc = client_list[addr]
-        message_send(f'{keyword} {fc}', addr)
-        return
+        fc = ''
+        for k, v in client_list.items():
+            if v == addr:
+                message_send(f'{keyword} {k}', addr)
+                return
     friend_code = msg['sendee']
     address = client_list[friend_code]
     msg['sendee'] = address
