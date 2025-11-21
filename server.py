@@ -67,6 +67,7 @@ def add_client(addr):
 
 def message_recv():
     while True:
+        print(len(client_list.keys()))
         server_socket.listen(len(client_list.keys())+1)
         conn, addr_raw = server_socket.accept()
         addr = addr_raw[0] #addr_raw[addr_raw.index('(')+1:addr_raw.index(',')]
