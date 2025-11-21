@@ -37,7 +37,6 @@ client_list = dict()
 client_file = 'client_list.csv'
 
 send_queue = Queue()
-lock = threading.Lock()
 
 
 def initialize():
@@ -77,8 +76,7 @@ def message_recv():
     friend_code = msg['sendee']
     address = client_list[friend_code]
     msg['sendee'] = address
-    with lock:
-        send_queue.put(msg)
+    send_queue.put(msg)
 
 
 def message_send(message_data, addr):
@@ -97,10 +95,9 @@ listen_thread = threading.Thread(target=message_recv, daemon=True)
 
 print('system running!')
 while True:
-    with lock:
-        while not send_queue.empty():
-            msg = send_queue.get()
-            addr = msg['sendee']
-            msg_to_send = json.dumps(msg)
-            message_send(msg_to_send, addr)
+    while not send_queue.empty():
+        msg = send_queue.get()
+        addr = msg['sendee']
+        msg_to_send = json.dumps(msg)
+        message_send(msg_to_send, addr)
     time.sleep(0.1)
