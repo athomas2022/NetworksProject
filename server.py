@@ -64,7 +64,7 @@ def add_client(addr):
 
 
 def message_recv():
-    server_socket.listen(len(client_list.keys()))
+    server_socket.listen(len(client_list.keys())+1)
     conn, addr = server_socket.accept()
     if addr not in client_list.keys():
         fc = add_client(addr)
