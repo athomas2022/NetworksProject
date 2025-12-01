@@ -56,11 +56,18 @@ def set_contact(c):
 
 def generate_message_text(md, clr):
     new_message = CTkTextbox(master=ChatScrollable, height=24 * (1 + (len(md) // 92)), wrap='word')
-    new_message.insert('0.0', md)
-    new_message.tag_config('sender_color', foreground=clr)
-    new_message.tag_add('sender_color', '1.0', '1.4')
-    new_message.configure(state='disabled')
-    new_message.pack(fill='x')
+    if clr == 'red':
+        new_message.insert('0.0', md)
+        new_message.tag_config('sender_color', foreground=clr)
+        new_message.tag_add('sender_color', '1.0', '1.4')
+        new_message.configure(state='disabled')
+        new_message.pack(fill='x')
+    else:
+        new_message.insert('0.0', 'Them: ' + md)
+        new_message.tag_config('sender_color', foreground=clr)
+        new_message.tag_add('sender_color', '1.0', '1.5')
+        new_message.configure(state='disabled')
+        new_message.pack(fill='x')
 
 
 def send_btn():
@@ -162,7 +169,7 @@ def check_incoming():
             fc = msg_json['message'].replace(keyword, '').strip()
             CTkMessagebox(title='Successful server connection', message=f'Your server friendcode is {fc}')
         else:
-            generate_message_text(msg, 'blue')
+            generate_message_text(msg_json['message'], 'blue')
     root.after(50, check_incoming)
 
 
