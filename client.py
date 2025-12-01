@@ -44,7 +44,10 @@ def update_cc(updated_cc):
 def message_send(message_data, dest, serv):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print('connecting...')
-    sock.connect((serv, 3231))
+    if get_server_mode():
+        sock.connect((serv, 3231))
+    else:
+        sock.connect((serv, 12345))
     sr = source_addr
     if get_server_mode():
         sr = friend_code
