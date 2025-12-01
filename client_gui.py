@@ -35,7 +35,6 @@ def refresh_contact_list():
     def get_ct_list():
         return contact_list
     clear_contacts()
-    print(len(contact_list))
     global contact_btns
     contact_btns.clear()
     for i in range(len(contact_list)):
@@ -91,7 +90,6 @@ def generate_message_text(md, clr):
 def send_btn():
     msg_data = 'Me: ' + ChatEntry.get()
     if len(msg_data) > 4:
-        print(f'{client.get_server_mode()} :: {server_contact}')
         if client.get_server_mode():
             client.message_send(ChatEntry.get(), server_contact, server_addr)
         else:

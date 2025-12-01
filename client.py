@@ -43,7 +43,6 @@ def update_cc(updated_cc):
 
 def message_send(message_data, dest, serv):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print('connecting...')
     if get_server_mode():
         sock.connect((serv, 3231))
     else:
@@ -51,7 +50,6 @@ def message_send(message_data, dest, serv):
     sr = source_addr
     if get_server_mode():
         sr = friend_code
-    print(sr)
     payload = {"message": message_data, "sendee": dest, 'sender': sr}
     payload_data = json.dumps(payload).encode('utf-8')
     sock.sendall(payload_data)
@@ -59,12 +57,8 @@ def message_send(message_data, dest, serv):
 
 
 def message_recv():
-    print('running')
-    print('listening...')
     recv_socket.listen(contact_count)
-    print('accepting...')
     conn, addr = recv_socket.accept()
-    print(f"Connected by {addr}")
     d = conn.recv(1024)
     return d.decode('utf-8')
 
