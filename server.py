@@ -81,7 +81,7 @@ class AydegerServer(socketserver.BaseRequestHandler):
         print('connecting...')
         sock.connect((addr, 12345))
         print(f'connected to {addr}!')
-        print(f'{addr}  {snd}')
+        print(f'sending to {addr} from {snd}')
         payload = {"message": message_data, "sendee": addr, 'sender': snd}
         payload_data = json.dumps(payload).encode('utf-8')
         sock.sendall(payload_data)
