@@ -76,12 +76,12 @@ class AydegerServer(socketserver.BaseRequestHandler):
             self.send_queue.put(msg)
             conn.close()
 
-    def message_send(self, message_data, addr):
+    def message_send(self, message_data, addr, snd=''):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print('connecting...')
         sock.connect((addr, 12345))
         print(f'connected to {addr}!')
-        payload = {"message": message_data, "sendee": addr}
+        payload = {"message": message_data, "sendee": addr, 'sender': snd}
         payload_data = json.dumps(payload).encode('utf-8')
         sock.sendall(payload_data)
         sock.close()
@@ -106,7 +106,7 @@ class AydegerServer(socketserver.BaseRequestHandler):
             friend_code = msg['sendee'].strip()
             address = self.client_list[friend_code]
             msg['sendee'] = address
-            self.message_send(msg['message'], address)
+            self.message_send(msg['message'], address, msg['sender'])
 
 
 print('initializing system...')
