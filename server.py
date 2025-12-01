@@ -106,7 +106,7 @@ class AydegerServer(socketserver.BaseRequestHandler):
             friend_code = msg['sendee'].strip()
             address = self.client_list[friend_code]
             msg['sendee'] = address
-            self.message_send(json.dumps(msg), addr)
+            self.message_send(msg['message'], address)
 
 
 print('initializing system...')
