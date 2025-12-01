@@ -29,11 +29,12 @@ def clear_messages():
     for dm in ChatScrollable.winfo_children():
         dm.destroy()
 
+
 def refresh_contact_list():
     clear_contacts()
     print(len(contact_list))
     for c in contact_list:
-        cb = CTkButton(master=ContactScrollable, text=c, height=20, command=lambda: set_contact(c))
+        cb = CTkButton(master=ContactScrollable, text=c, height=20, command=lambda: set_contact(cb.cget("text")))
         cb.pack(pady=(2, 2), fill='x')
 
 
@@ -83,7 +84,7 @@ def generate_message_text(md, clr):
 def send_btn():
     msg_data = 'Me: ' + ChatEntry.get()
     if len(msg_data) > 4:
-        print(msg_data)
+        print(f'{client.get_server_mode()} :: {server_contact}')
         if client.get_server_mode():
             client.message_send(ChatEntry.get(), server_contact, server_addr)
         else:
@@ -187,8 +188,10 @@ def check_incoming():
         msg_json = json.loads(msg)
         if keyword in msg_json['message']:
             fc = msg_json['message'].replace(keyword, '').strip()
+            client.update_fc(fc)
             CTkMessagebox(title='Successful server connection', message=f'Your server friendcode is {fc}')
         else:
+            print(msg_json['sender'].strip())
             if (client.get_server_mode() and msg_json['sender'].strip() == server_contact) or (not client.get_server_mode() and msg_json['sender'].strip() == direct_contact):
                 generate_message_text(msg_json['message'], 'blue')
     root.after(50, check_incoming)

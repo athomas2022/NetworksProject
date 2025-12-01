@@ -51,6 +51,7 @@ def message_send(message_data, dest, serv):
     sr = source_addr
     if get_server_mode():
         sr = friend_code
+    print(sr)
     payload = {"message": message_data, "sendee": dest, 'sender': sr}
     payload_data = json.dumps(payload).encode('utf-8')
     sock.sendall(payload_data)
