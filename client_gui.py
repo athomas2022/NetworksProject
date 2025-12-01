@@ -19,9 +19,18 @@ def on_close():
     client.close()
     root.destroy()
 
-def refresh_contact_list():
+
+def clear_contacts():
     for wg in ContactScrollable.winfo_children():
         wg.destroy()
+
+
+def clear_messages():
+    for dm in ChatScrollable.winfo_children():
+        dm.destroy()
+
+def refresh_contact_list():
+    clear_contacts()
     print(len(contact_list))
     for c in contact_list:
         cb = CTkButton(master=ContactScrollable, text=c, height=20, command=lambda: set_contact(c))
@@ -52,6 +61,7 @@ def write_contact(new_contact):
 def set_contact(c):
     global server_contact
     server_contact = c
+    clear_contacts()
 
 
 def generate_message_text(md, clr):
@@ -74,7 +84,10 @@ def send_btn():
     msg_data = 'Me: ' + ChatEntry.get()
     if len(msg_data) > 4:
         print(msg_data)
-        client.message_send(ChatEntry.get(), server_contact, server_addr)
+        if client.get_server_mode():
+            client.message_send(ChatEntry.get(), server_contact, server_addr)
+        else:
+            client.message_send(ChatEntry.get(), direct_contact, direct_contact)
         generate_message_text(msg_data, 'red')
         ChatEntry.delete(0, len(msg_data))
 
@@ -100,12 +113,18 @@ def menu_gui():
         global server_addr
         server_addr = server
         client.update_server_mode(True)
+        clear_messages()
+        refresh_contact_list()
         client.message_send(keyword, server, server)
         ServerContactEntry.configure(state='normal', placeholder_text='Enter friendcode...')
         ServerContactBtn.configure(state='normal')
 
-    def direct_connect():
+    def direct_connect(addr):
+        global direct_contact
         client.update_server_mode(False)
+        clear_contacts()
+        clear_messages()
+        direct_contact = addr
         ServerContactEntry.configure(state='disabled')
         ServerContactBtn.configure(state='disabled')
 
@@ -119,7 +138,7 @@ def menu_gui():
     MenuFrame.grid(column=0, row=0)
     ContactEntry = CTkEntry(master=MenuFrame, placeholder_text='Direct Connect with IP', width=300, height=50)
     ContactEntry.grid(column=0, row=0)
-    ContactBtn = CTkButton(master=MenuFrame, text='Connect', width=100, height=50, command=direct_connect)
+    ContactBtn = CTkButton(master=MenuFrame, text='Connect', width=100, height=50, command=lambda: direct_connect(ContactEntry.get()))
     ContactBtn.grid(column=1, row=0)
     ServerEntry = CTkEntry(master=MenuFrame, placeholder_text='Enter server IP...', width=300, height=50)
     ServerEntry.grid(column=0, row=1)
@@ -127,7 +146,7 @@ def menu_gui():
     ServerBtn.grid(column=1, row=1)
     ServerContactEntry = CTkEntry(master=MenuFrame, placeholder_text='Enter friendcode...', width=300, height=50, state=is_disabled())
     ServerContactEntry.grid(column=0, row=2)
-    ServerContactBtn = CTkButton(master=MenuFrame, text='Add', width=100, height=50, command=lambda: write_contact(ServerContactEntry.get()), state=is_disabled())
+    ServerContactBtn = CTkButton(master=MenuFrame, text='Add', width=100, height=50, command=lambda: add_contact(ServerContactEntry.get()), state=is_disabled())
     ServerContactBtn.grid(column=1, row=2)
     menu_root.mainloop()
 
