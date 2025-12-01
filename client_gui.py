@@ -61,7 +61,7 @@ def write_contact(new_contact):
 def set_contact(c):
     global server_contact
     server_contact = c
-    clear_contacts()
+    clear_messages()
 
 
 def generate_message_text(md, clr):
