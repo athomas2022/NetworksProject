@@ -181,6 +181,7 @@ ContactScrollable.pack(expand=1, fill="both")
 
 
 def check_incoming():
+    global server_contact, direct_contact
     while not incoming.empty():
         msg = incoming.get()
         msg_json = json.loads(msg)
