@@ -192,6 +192,7 @@ def check_incoming():
             CTkMessagebox(title='Successful server connection', message=f'Your server friendcode is {fc}')
         else:
             print(msg_json['sender'].strip())
+            print(server_contact)
             if (client.get_server_mode() and msg_json['sender'].strip() == server_contact) or (not client.get_server_mode() and msg_json['sender'].strip() == direct_contact):
                 generate_message_text(msg_json['message'], 'blue')
     root.after(50, check_incoming)
