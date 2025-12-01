@@ -90,7 +90,7 @@ class AydegerServer(socketserver.BaseRequestHandler):
         addr = self.client_address
         if addr not in self.client_list.values():
             fc = self.add_client(addr)
-            self.request.sendall(f'{self.keyword} {fc}')#, addr)
+            self.request.sendall(f'{self.keyword} {fc}'.encode('utf-8'))#, addr)
             return
         while True:
             data = self.request.recv(1024).strip()
@@ -100,12 +100,12 @@ class AydegerServer(socketserver.BaseRequestHandler):
             if self.keyword in msg['message']:
                 for k, v in self.client_list.items():
                     if v == addr:
-                        self.request.sendall(f'{self.keyword} {k}')#, addr)
+                        self.request.sendall(f'{self.keyword} {k}'.encode('utf-8'))#, addr)
                         return
             friend_code = msg['sendee']
             address = self.client_list[friend_code]
             msg['sendee'] = address
-            self.request.sendall(msg)
+            self.request.sendall(json.dumps(msg).encode('utf-8'))
 
 
 print('initializing system...')
