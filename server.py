@@ -16,7 +16,6 @@ class ThreadedAydegerServer(socketserver.ThreadingMixIn, socketserver.TCPServer)
 
 class AydegerServer(socketserver.BaseRequestHandler):
     def __init__(self, request, client_address, server):
-        super().__init__(request, client_address, server)
         self.keyword = "gR33tinG$"
         self.portnum = 3231
         fc_seed = int(time.time())
@@ -34,6 +33,7 @@ class AydegerServer(socketserver.BaseRequestHandler):
             with open(self.client_file, 'w') as cl:
                 pass
         self.get_clients()
+        super().__init__(request, client_address, server)
 
     def get_clients(self):
         with open(self.client_file, 'r') as cl:
