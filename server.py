@@ -81,7 +81,7 @@ class AydegerServer(socketserver.BaseRequestHandler):
         print('connecting...')
         sock.connect((addr, 12345))
         print(f'connected to {addr}!')
-        payload = {"message": message_data, "sendee": self.source_addr}
+        payload = {"message": message_data, "sendee": addr}
         payload_data = json.dumps(payload).encode('utf-8')
         sock.sendall(payload_data)
         sock.close()
@@ -90,7 +90,7 @@ class AydegerServer(socketserver.BaseRequestHandler):
         addr = self.client_address[0]
         if addr not in self.client_list.values():
             fc = self.add_client(addr)
-            self.request.sendall(f'{self.keyword} {fc}'.encode('utf-8'))#, addr)
+            self.message_send(f'{self.keyword} {fc}', addr)
             print('sent fc!')
             return
         while True:
@@ -101,12 +101,12 @@ class AydegerServer(socketserver.BaseRequestHandler):
             if self.keyword in msg['message']:
                 for k, v in self.client_list.items():
                     if v == addr:
-                        self.request.sendall(f'{self.keyword} {k}'.encode('utf-8'))#, addr)
+                        self.message_send(f'{self.keyword} {k}', addr)
                         return
             friend_code = msg['sendee']
             address = self.client_list[friend_code]
             msg['sendee'] = address
-            self.request.sendall(json.dumps(msg).encode('utf-8'))
+            self.message_send(json.dumps(msg), addr)
 
 
 print('initializing system...')
