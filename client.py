@@ -12,6 +12,7 @@ temp.close()
 test_dest = '163.118.57.142'
 contact_count = 1
 server_mode = False
+friend_code = ''
 
 recv_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 recv_socket.bind((source_addr, 12345))
@@ -24,6 +25,10 @@ def close():
 def update_server_mode(mode):
     global server_mode
     server_mode = mode
+
+def update_fc(fc):
+    global friend_code
+    friend_code = fc
 
 
 def get_server_mode():
@@ -40,7 +45,10 @@ def message_send(message_data, dest, serv):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print('connecting...')
     sock.connect((serv, 3231))
-    payload = {"message": message_data, "sendee": dest}
+    sr = source_addr
+    if get_server_mode():
+        sr = friend_code
+    payload = {"message": message_data, "sendee": dest, 'sender': sr}
     payload_data = json.dumps(payload).encode('utf-8')
     sock.sendall(payload_data)
     sock.close()
