@@ -13,6 +13,7 @@ keyword = "gR33tinG$"
 server_contact = ''
 server_addr = ''
 direct_contact = ''
+contact_btns = []
 
 
 def on_close():
@@ -31,11 +32,17 @@ def clear_messages():
 
 
 def refresh_contact_list():
+    def get_ct_list():
+        return contact_list
     clear_contacts()
     print(len(contact_list))
-    for c in contact_list:
-        cb = CTkButton(master=ContactScrollable, text=c, height=20, command=lambda: set_contact(cb.cget("text")))
-        cb.pack(pady=(2, 2), fill='x')
+    global contact_btns
+    contact_btns.clear()
+    for i in range(len(contact_list)):
+        cb = CTkButton(master=ContactScrollable, text=contact_list[i], height=20)
+        contact_btns.append(cb)
+        contact_btns[i].configure(command=lambda idx=i: set_contact(get_ct_list()[idx]))
+        contact_btns[i].pack(pady=(2, 2), fill='x')
 
 
 def get_contacts():
@@ -193,6 +200,7 @@ def check_incoming():
         else:
             print(msg_json['sender'].strip())
             print(server_contact)
+            print(msg_json['message'] == server_contact)
             if (client.get_server_mode() and msg_json['sender'].strip() == server_contact) or (not client.get_server_mode() and msg_json['sender'].strip() == direct_contact):
                 generate_message_text(msg_json['message'], 'blue')
     root.after(50, check_incoming)
