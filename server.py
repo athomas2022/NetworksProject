@@ -103,7 +103,7 @@ class AydegerServer(socketserver.BaseRequestHandler):
                     if v == addr:
                         self.message_send(f'{self.keyword} {k}', addr)
                         return
-            friend_code = msg['sendee']
+            friend_code = msg['sendee'].strip()
             address = self.client_list[friend_code]
             msg['sendee'] = address
             self.message_send(json.dumps(msg), addr)
