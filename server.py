@@ -87,10 +87,11 @@ class AydegerServer(socketserver.BaseRequestHandler):
         sock.close()
 
     def handle(self):
-        addr = self.client_address
+        addr = self.client_address[0]
         if addr not in self.client_list.values():
             fc = self.add_client(addr)
             self.request.sendall(f'{self.keyword} {fc}'.encode('utf-8'))#, addr)
+            print('sent fc!')
             return
         while True:
             data = self.request.recv(1024).strip()
