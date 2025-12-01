@@ -8,14 +8,15 @@ import random
 from queue import Queue
 import socketserver
 
+
 class ThreadedAydegerServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     daemon_threads = True
     allow_reuse_address = True
 
-class AydegerServer(socketserver.BaseRequestHandler):
 
+class AydegerServer(socketserver.BaseRequestHandler):
     def __init__(self, source_addr):
-        # super.__init__()
+        super.__init__()
         self.keyword = "gR33tinG$"
         self.portnum = 3231
         fc_seed = int(time.time())
@@ -126,7 +127,8 @@ while not selected:
             selected = True
         case _:
             print('invalid entry, options are \'external\' or \'internal\'')
-with ThreadedAydegerServer((source_addr, 3231), AydegerServer(source_addr)) as server:
+
+with ThreadedAydegerServer((source_addr, 3231), AydegerServer) as server:
     print('system running!')
     server.serve_forever()
 # while True:
